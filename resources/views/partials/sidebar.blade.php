@@ -12,7 +12,7 @@
     <!-- Navigation links -->
     <div class="flex-grow-1 overflow-y-auto px-3 py-4">
         <ul class="nav nav-pills flex-column gap-2">
-            
+
             <li class="nav-item">
                 <a href="{{ route('dashboard') }}" class="nav-link text-white d-flex align-items-center gap-3 py-3 px-3 {{ Route::is('dashboard') ? 'active bg-primary' : 'hover-bg' }}">
                     <i class="bi bi-speedometer2"></i>
@@ -20,33 +20,51 @@
                 </a>
             </li>
 
-            <!-- Ticket Section Header -->
-            <li class="nav-header text-muted text-uppercase fs-8 fw-semibold tracking-wider mt-3 mb-2 px-3">Ticket Center</li>
+            {{-- ============================
+                 TICKET CENTER SUBMENU
+            ============================= --}}
+            @php
+                $ticketActive = Route::is('tickets.index') || Route::is('tickets.create');
+            @endphp
 
             <li class="nav-item">
-                <a href="{{ route('tickets.index') }}" class="nav-link text-white d-flex align-items-center gap-3 py-3 px-3 {{ Route::is('tickets.index') && !request()->has('create') ? 'active bg-primary' : 'hover-bg' }}">
-                    <i class="bi bi-ticket-perforated"></i>
-                    <span>
-                        @if(auth()->user()->isAdmin())
-                            All Tickets
-                        @elseif(auth()->user()->isTeamLead())
-                            Team Tickets
-                        @else
-                            My Tickets
-                        @endif
-                    </span>
+                <a href="#"
+                   class="nav-link text-white menu-toggle d-flex justify-content-between align-items-center {{ $ticketActive ? 'parent-active' : '' }}"
+                   data-submenu="submenu-tickets">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-ticket-perforated"></i>
+                        <span>Ticket Center</span>
+                    </div>
+                    <i class="bi bi-chevron-down submenu-icon"></i>
                 </a>
+                <ul class="submenu {{ $ticketActive ? 'show' : '' }}" id="submenu-tickets">
+                    <li>
+                        <a href="{{ route('tickets.index') }}" class="nav-link text-white {{ Route::is('tickets.index') ? 'active bg-primary' : 'hover-bg' }}">
+                            <i class="bi bi-list"></i>
+                            <span>
+                                @if(auth()->user()->isAdmin())
+                                    All Tickets
+                                @elseif(auth()->user()->isTeamLead())
+                                    Team Tickets
+                                @else
+                                    My Tickets
+                                @endif
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('tickets.create') }}" class="nav-link text-white {{ Route::is('tickets.create') ? 'active bg-primary' : 'hover-bg' }}">
+                            <i class="bi bi-plus-circle"></i>
+                            <span>Create Ticket</span>
+                        </a>
+                    </li>
+                </ul>
             </li>
 
-            <li class="nav-item">
-                <a href="{{ route('tickets.create') }}" class="nav-link text-white d-flex align-items-center gap-3 py-3 px-3 {{ Route::is('tickets.create') ? 'active bg-primary' : 'hover-bg' }}">
-                    <i class="bi bi-plus-circle"></i>
-                    <span>Create Ticket</span>
-                </a>
-            </li>
-
-            <!-- Escalations -->
-             {{--
+            {{-- ============================
+                 ESCALATIONS (commented out)
+            ============================= --}}
+            {{--
             @if(auth()->user()->isAdmin() || auth()->user()->isTeamLead() || auth()->user()->isProjectManager())
                 <li class="nav-item">
                     <a href="{{ route('escalations.index') }}" class="nav-link text-white d-flex align-items-center gap-3 py-3 px-3 {{ Route::is('escalations.index') ? 'active bg-primary' : 'hover-bg' }}">
@@ -56,60 +74,95 @@
                 </li>
             @endif
             --}}
-            <!-- Organization / HR Section -->
+
+            {{-- ============================
+                 MANAGEMENT SUBMENU
+            ============================= --}}
             @if(auth()->user()->isAdmin() || auth()->user()->isTeamLead() || auth()->user()->isProjectManager())
-                <li class="nav-header text-muted text-uppercase fs-8 fw-semibold tracking-wider mt-3 mb-2 px-3">Management</li>
+            @php
+                $managementActive = Route::is('hierarchy.index')
+                    || Route::is('users.index')
+                    || Route::is('departments.index')
+                    || Route::is('roles.index')
+                    || Route::is('ticket-categories.index');
+            @endphp
 
-                <li class="nav-item">
-                    <a href="{{ route('hierarchy.index') }}" class="nav-link text-white d-flex align-items-center gap-3 py-3 px-3 {{ Route::is('hierarchy.index') ? 'active bg-primary' : 'hover-bg' }}">
+            <li class="nav-item">
+                <a href="#"
+                   class="nav-link text-white menu-toggle d-flex justify-content-between align-items-center {{ $managementActive ? 'parent-active' : '' }}"
+                   data-submenu="submenu-management">
+                    <div class="d-flex align-items-center gap-2">
                         <i class="bi bi-diagram-3"></i>
-                        <span>Hierarchy Tree</span>
-                    </a>
-                </li>
+                        <span>Management</span>
+                    </div>
+                    <i class="bi bi-chevron-down submenu-icon"></i>
+                </a>
+                <ul class="submenu {{ $managementActive ? 'show' : '' }}" id="submenu-management">
+                    <li>
+                        <a href="{{ route('hierarchy.index') }}" class="nav-link text-white {{ Route::is('hierarchy.index') ? 'active bg-primary' : 'hover-bg' }}">
+                            <i class="bi bi-diagram-3"></i>
+                            <span>Hierarchy Tree</span>
+                        </a>
+                    </li>
+                    @if(auth()->user()->isAdmin())
+                    <li>
+                        <a href="{{ route('users.index') }}" class="nav-link text-white {{ Route::is('users.index') ? 'active bg-primary' : 'hover-bg' }}">
+                            <i class="bi bi-people"></i>
+                            <span>User Management</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('departments.index') }}" class="nav-link text-white {{ Route::is('departments.index') ? 'active bg-primary' : 'hover-bg' }}">
+                            <i class="bi bi-building"></i>
+                            <span>Departments</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('roles.index') }}" class="nav-link text-white {{ Route::is('roles.index') ? 'active bg-primary' : 'hover-bg' }}">
+                            <i class="bi bi-shield-lock"></i>
+                            <span>Roles & Permissions</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('ticket-categories.index') }}" class="nav-link text-white {{ Route::is('ticket-categories.index') ? 'active bg-primary' : 'hover-bg' }}">
+                            <i class="bi bi-tags"></i>
+                            <span>Ticket Categories</span>
+                        </a>
+                    </li>
+                    @endif
+                </ul>
+            </li>
             @endif
 
-            <!-- Admin Section -->
-            @if(auth()->user()->isAdmin())
-                <li class="nav-item">
-                    <a href="{{ route('users.index') }}" class="nav-link text-white d-flex align-items-center gap-3 py-3 px-3 {{ Route::is('users.index') ? 'active bg-primary' : 'hover-bg' }}">
-                        <i class="bi bi-people"></i>
-                        <span>User Management</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{{ route('departments.index') }}" class="nav-link text-white d-flex align-items-center gap-3 py-3 px-3 {{ Route::is('departments.index') ? 'active bg-primary' : 'hover-bg' }}">
-                        <i class="bi bi-building"></i>
-                        <span>Departments</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{{ route('roles.index') }}" class="nav-link text-white d-flex align-items-center gap-3 py-3 px-3 {{ Route::is('roles.index') ? 'active bg-primary' : 'hover-bg' }}">
-                        <i class="bi bi-shield-lock"></i>
-                        <span>Roles & Permissions</span>
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{{ route('ticket-categories.index') }}" class="nav-link text-white d-flex align-items-center gap-3 py-3 px-3 {{ Route::is('ticket-categories.index') ? 'active bg-primary' : 'hover-bg' }}">
-                        <i class="bi bi-tags"></i>
-                        <span>Ticket Categories</span>
-                    </a>
-                </li>
-            @endif
-
-            <!-- Reports and Logs -->
+            {{-- ============================
+                 ANALYTICS SUBMENU
+            ============================= --}}
             @if(auth()->user()->isAdmin() || auth()->user()->isProjectManager() || auth()->user()->isHR())
-                <li class="nav-header text-muted text-uppercase fs-8 fw-semibold tracking-wider mt-3 mb-2 px-3">Analytics</li>
+            @php
+                $analyticsActive = Route::is('reports.index');
+            @endphp
 
-                <li class="nav-item">
-                    <a href="{{ route('reports.index') }}" class="nav-link text-white d-flex align-items-center gap-3 py-3 px-3 {{ Route::is('reports.index') ? 'active bg-primary' : 'hover-bg' }}">
+            <li class="nav-item">
+                <a href="#"
+                   class="nav-link text-white menu-toggle d-flex justify-content-between align-items-center {{ $analyticsActive ? 'parent-active' : '' }}"
+                   data-submenu="submenu-analytics">
+                    <div class="d-flex align-items-center gap-2">
                         <i class="bi bi-bar-chart"></i>
-                        <span>System Reports</span>
-                    </a>
-                </li>
+                        <span>Analytics</span>
+                    </div>
+                    <i class="bi bi-chevron-down submenu-icon"></i>
+                </a>
+                <ul class="submenu {{ $analyticsActive ? 'show' : '' }}" id="submenu-analytics">
+                    <li>
+                        <a href="{{ route('reports.index') }}" class="nav-link text-white {{ Route::is('reports.index') ? 'active bg-primary' : 'hover-bg' }}">
+                            <i class="bi bi-bar-chart"></i>
+                            <span>System Reports</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
             @endif
+
             {{--
             @if(auth()->user()->isAdmin())
                 <li class="nav-item">
@@ -118,7 +171,6 @@
                         <span>Activity Logs</span>
                     </a>
                 </li>
-
                 <li class="nav-item">
                     <a href="{{ route('settings.index') }}" class="nav-link text-white d-flex align-items-center gap-3 py-3 px-3 {{ Route::is('settings.index') ? 'active bg-primary' : 'hover-bg' }}">
                         <i class="bi bi-sliders"></i>
@@ -188,16 +240,13 @@
     font-size: .95rem;
     font-weight: 500;
     padding: 12px 14px !important;
-
     display: flex;
     align-items: center;
-
-    gap: 10px !important; /* icon aur text gap kam */
+    gap: 10px !important;
     transition: all .25s ease;
 }
 
 /* Icons */
-
 .nav-link i {
     width: 18px;
     font-size: 1rem;
@@ -205,7 +254,6 @@
 }
 
 /* Hover */
-
 .nav-link:hover,
 .hover-bg:hover {
     background: rgba(188, 52, 44, 0.12);
@@ -213,8 +261,7 @@
     transform: translateX(4px);
 }
 
-/* Active */
-
+/* Active child link */
 .nav-link.active {
     background: #bc342c !important;
     color: #ffffff !important;
@@ -223,6 +270,21 @@
 
 .nav-link.active i {
     color: #ffffff;
+}
+
+/* =========================
+   PARENT ACTIVE STATE
+   (when a child route is active)
+========================= */
+
+.nav-link.parent-active {
+    background: rgba(188, 52, 44, 0.18) !important;
+    color: #ffffff !important;
+    border-left: 3px solid #bc342c;
+}
+
+.nav-link.parent-active .submenu-icon {
+    transform: rotate(180deg);
 }
 
 /* =========================
@@ -271,13 +333,82 @@
 ========================= */
 
 @media (max-width: 991.98px) {
-
     #sidebar {
         left: -260px !important;
     }
-
     #sidebar.show {
         left: 0 !important;
     }
 }
+
+/* =========================
+   SUB MENU
+========================= */
+
+.submenu {
+    display: none;
+    list-style: none;
+    padding-left: 18px;
+    margin: 6px 0 0;
+    padding-bottom: 4px;
+}
+
+.submenu.show {
+    display: block;
+}
+
+.submenu .nav-link {
+    padding: 10px 14px !important;
+    font-size: 0.9rem;
+}
+
+.submenu .nav-link:hover {
+    background: rgba(188, 52, 44, 0.12);
+}
+
+.submenu {
+    border-left: 2px solid rgba(188, 52, 44, 0.35);
+    margin-left: 20px;
+}
+
+.menu-toggle {
+    cursor: pointer;
+}
+
+.submenu-icon {
+    transition: transform .3s ease;
+    font-size: .85rem;
+    flex-shrink: 0;
+}
+
+
+.menu-toggle.active .submenu-icon {
+    transform: rotate(180deg);
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.menu-toggle').forEach(function (toggle) {
+        var submenuId = toggle.getAttribute('data-submenu');
+        var submenu   = submenuId ? document.getElementById(submenuId) : toggle.nextElementSibling;
+        if (submenu && submenu.classList.contains('show')) {
+            toggle.classList.add('active');
+        }
+        toggle.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            this.classList.toggle('active');
+
+            var target = this.getAttribute('data-submenu')
+                ? document.getElementById(this.getAttribute('data-submenu'))
+                : this.nextElementSibling;
+
+            if (target) {
+                target.classList.toggle('show');
+            }
+        });
+    });
+
+});
+</script>
