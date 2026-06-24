@@ -32,8 +32,7 @@ class UserController extends Controller
             'department_id' => 'required|exists:departments,id',
             'reporting_to' => 'nullable|exists:users,id',
             'phone' => 'nullable|string|max:20',
-            'roles' => 'required|array',
-            'roles.*' => 'exists:roles,id',
+            'role_id' => 'required|exists:roles,id',
         ]);
 
         $user = User::create([
@@ -43,10 +42,11 @@ class UserController extends Controller
             'department_id' => $request->department_id,
             'reporting_to' => $request->reporting_to,
             'phone' => $request->phone,
+            'role_id' => $request->role_id,
             'status' => 'active'
         ]);
 
-        $user->roles()->sync($request->roles);
+        $user->roles()->sync([$request->role_id]);
 
         \App\Models\Hierarchy::updateOrCreate(
             ['user_id' => $user->id],
@@ -73,8 +73,7 @@ class UserController extends Controller
             'department_id' => 'required|exists:departments,id',
             'reporting_to' => 'nullable|exists:users,id',
             'phone' => 'nullable|string|max:20',
-            'roles' => 'required|array',
-            'roles.*' => 'exists:roles,id',
+            'role_id' => 'required|exists:roles,id',
             'status' => 'required|in:active,inactive',
         ]);
 
@@ -85,6 +84,7 @@ class UserController extends Controller
             'reporting_to' => $request->reporting_to,
             'phone' => $request->phone,
             'status' => $request->status,
+            'role_id' => $request->role_id,
         ];
 
         if ($request->filled('password')) {
@@ -92,7 +92,7 @@ class UserController extends Controller
         }
 
         $user->update($data);
-        $user->roles()->sync($request->roles);
+        $user->roles()->sync([$request->role_id]);
 
         \App\Models\Hierarchy::updateOrCreate(
             ['user_id' => $user->id],

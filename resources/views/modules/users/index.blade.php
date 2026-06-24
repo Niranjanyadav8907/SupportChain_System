@@ -131,7 +131,7 @@
                         <div class="d-flex flex-wrap gap-3">
                             @foreach($roles as $role)
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="roles[]" value="{{ $role->id }}" id="role_{{ $role->id }}">
+                                    <input class="form-check-input" type="radio" name="role_id" value="{{ $role->id }}"id="role_{{ $role->id }}">
                                     <label class="form-check-label" for="role_{{ $role->id }}">{{ $role->name }}</label>
                                 </div>
                             @endforeach
@@ -203,7 +203,7 @@
                             <div class="d-flex flex-wrap gap-3">
                                 @foreach($roles as $role)
                                     <div class="form-check">
-                                        <input class="form-check-input edit-role-checkbox" type="checkbox" name="roles[]" value="{{ $role->id }}" id="edit_role_{{ $role->id }}">
+                                        <input class="form-check-input edit-role-radio" type="radio" name="role_id" value="{{ $role->id }}"id="edit_role_{{ $role->id }}">
                                         <label class="form-check-label" for="edit_role_{{ $role->id }}">{{ $role->name }}</label>
                                     </div>
                                 @endforeach
@@ -268,10 +268,8 @@
             $('#edit_reporting_to').val(user.reporting_to);
             $('#edit_status').val(user.status);
 
-            $('.edit-role-checkbox').prop('checked', false);
-            userRoles.forEach(roleId => {
-                $('#edit_role_' + roleId).prop('checked', true);
-            });
+            $('.edit-role-radio').prop('checked', false);
+            $('#edit_role_' + user.role_id).prop('checked', true);
         });
 
         // Edit User Submit

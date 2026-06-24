@@ -6,20 +6,15 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -32,21 +27,11 @@ class User extends Authenticatable
         'status',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -55,14 +40,25 @@ class User extends Authenticatable
         ];
     }
 
+   
+    //=========================Relationships ========================================
+   
+
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
     }
 
+    
     public function role(): BelongsTo
     {
-        return $this->belongsTo(Role::class);
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class);
     }
 
     public function manager(): BelongsTo
@@ -73,11 +69,6 @@ class User extends Authenticatable
     public function subordinates(): HasMany
     {
         return $this->hasMany(User::class, 'reporting_to');
-    }
-
-    public function roles(): BelongsToMany
-    {
-        return $this->belongsToMany(Role::class);
     }
 
     public function tickets(): HasMany
@@ -95,7 +86,7 @@ class User extends Authenticatable
         return $this->hasMany(ActivityLog::class);
     }
 
-    public function hierarchy(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function hierarchy()
     {
         return $this->hasOne(Hierarchy::class);
     }
@@ -108,24 +99,31 @@ class User extends Authenticatable
                     ->withTimestamps();
     }
 
+    
+    //========================  Role Helpers =======================================
+    
+
     public function hasRole(string|array $roleName): bool
     {
         $userRoleName = $this->role?->name;
+
         if (is_array($roleName)) {
             return in_array($userRoleName, $roleName);
         }
+
         return $userRoleName === $roleName;
     }
 
-    /**
-     * Check if user has a specific permission.
-     */
     public function hasPermission(string $permissionName): bool
     {
         $role = $this->role;
+
         if ($role) {
-            return $role->permissions()->where('name', $permissionName)->exists();
+            return $role->permissions()
+                        ->where('name', $permissionName)
+                        ->exists();
         }
+
         return false;
     }
 
@@ -154,4 +152,3 @@ class User extends Authenticatable
         return $this->hasRole('Employee');
     }
 }
-
