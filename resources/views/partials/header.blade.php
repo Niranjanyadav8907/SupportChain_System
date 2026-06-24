@@ -92,7 +92,6 @@
 </nav>
 
 <script>
-    // Sidebar toggler for smaller resolutions
     document.addEventListener("DOMContentLoaded", function() {
         var sidebarBtn = document.getElementById("sidebarToggle");
         if (sidebarBtn) {
