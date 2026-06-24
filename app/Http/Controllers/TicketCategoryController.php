@@ -9,18 +9,17 @@ use Illuminate\Support\Str;
 
 class TicketCategoryController extends Controller
 {
-    /**
-     * Display categories.
-     */
+    
+     
     public function index()
     {
         $categories = TicketCategory::all();
         return view('modules.ticket_categories.index', compact('categories'));
     }
 
-    /**
-     * Store category.
-     */
+    
+    //================= Store category.=========================================
+     
     public function store(Request $request)
     {
         $request->validate([
@@ -45,9 +44,9 @@ class TicketCategoryController extends Controller
         ]);
     }
 
-    /**
-     * Update category.
-     */
+    
+    //======================= Update category.============================================
+    
     public function update(Request $request, TicketCategory $category)
     {
         $request->validate([
@@ -72,12 +71,11 @@ class TicketCategoryController extends Controller
         ]);
     }
 
-    /**
-     * Delete category.
-     */
+
+     //============================= Delete category.===========================================
+     
     public function destroy(TicketCategory $category)
     {
-        // Restrict if tickets exist
         if ($category->tickets()->exists()) {
             return response()->json([
                 'success' => false,

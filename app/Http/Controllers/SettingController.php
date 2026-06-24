@@ -7,18 +7,18 @@ use Illuminate\Http\Request;
 
 class SettingController extends Controller
 {
-    /**
-     * Display settings panel.
-     */
+    
+    //=========================== Display settings panel.===================================
+    
     public function index()
     {
         $settings = Setting::all()->groupBy('group');
         return view('modules.settings.index', compact('settings'));
     }
 
-    /**
-     * Batch update settings.
-     */
+    
+    // ==========================Batch update settings.======================================
+     
     public function update(Request $request)
     {
         $request->validate([
@@ -29,7 +29,7 @@ class SettingController extends Controller
             Setting::where('key', $key)->update(['value' => $value]);
         }
 
-        // Log action
+        
         \App\Models\ActivityLog::create([
             'user_id' => auth()->id(),
             'action' => 'SETTINGS UPDATED',

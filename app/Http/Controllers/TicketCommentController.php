@@ -12,9 +12,7 @@ use Illuminate\Support\Facades\Log;
 
 class TicketCommentController extends Controller
 {
-    /**
-     * Store comment.
-     */
+    
     public function store(Request $request, Ticket $ticket)
     {
         $request->validate([
@@ -26,7 +24,6 @@ class TicketCommentController extends Controller
         $user = Auth::user();
         $isInternal = $request->boolean('is_internal', false);
 
-        // Validate internal note authorization
         if ($isInternal && !$user->isAdmin() && !$user->isTeamLead() && !$user->isProjectManager() && !$user->isHR()) {
             return response()->json([
                 'success' => false,
@@ -34,7 +31,7 @@ class TicketCommentController extends Controller
             ], 403);
         }
 
-        // Upload attachment if any
+        // ====================== Upload attachment if any ============================================
         $attachmentPath = null;
         if ($request->hasFile('attachment')) {
             $attachmentPath = $request->file('attachment')->store('comments', 'public');
@@ -47,7 +44,7 @@ class TicketCommentController extends Controller
             'attachment_path' => $attachmentPath
         ]);
 
-        // If comment has attachment, also register in TicketAttachment table for consolidated attachment tabs
+        
         if ($request->hasFile('attachment')) {
             TicketAttachment::create([
                 'ticket_id' => $ticket->id,
@@ -59,7 +56,7 @@ class TicketCommentController extends Controller
             ]);
         }
 
-        // Send notifications
+        // ======================= Send notifications =====================================
         // Notify Assignee (if comment by creator) or Creator (if comment by assignee)
         $notifyUser = null;
         if ($comment->user_id === $ticket->user_id) {
@@ -76,7 +73,6 @@ class TicketCommentController extends Controller
             }
         }
 
-        // Return HTML component or Json for AJAX injection
         return response()->json([
             'success' => true,
             'message' => 'Comment posted successfully.',

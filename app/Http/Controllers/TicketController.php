@@ -21,19 +21,15 @@ use Illuminate\Support\Str;
 
 class TicketController extends Controller
 {
-    /**
-     * Display a listing of tickets.
-     */
+
     public function index(Request $request)
     {
         $user = Auth::user();
         $query = Ticket::with(['creator', 'assignee', 'category', 'department']);
 
-        // Filter based on user role and department hierarchy
         if ($user->isAdmin()) {
-            // Admins see all tickets
+            
         } elseif ($user->isTeamLead()) {
-            // Team Leads see tickets raised by their subordinates or assigned to them
             $subordinateIds = User::where('reporting_to', $user->id)->pluck('id')->toArray();
             $subordinateIds[] = $user->id;
             $query->where(function($q) use ($user, $subordinateIds) {
@@ -42,23 +38,20 @@ class TicketController extends Controller
                   ->orWhere('department_id', $user->department_id);
             });
         } elseif ($user->isProjectManager()) {
-            // PMs see all tickets in their department or escalated tickets
             $query->where(function($q) use ($user) {
                 $q->where('department_id', $user->department_id)
                   ->orWhere('assigned_to', $user->id)
                   ->orWhereNotNull('escalated_at');
             });
         } elseif ($user->isHR()) {
-            // HR sees HR Request and Leave Request tickets
             $query->whereHas('category', function($q) {
                 $q->whereIn('slug', ['hr-request', 'leave-request']);
             });
         } else {
-            // Employee role: only see own raised tickets
             $query->where('user_id', $user->id);
         }
 
-        // Apply filters
+        // ================================ Apply filters=======================================
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
@@ -83,18 +76,14 @@ class TicketController extends Controller
         return view('modules.tickets.index', compact('tickets', 'categories'));
     }
 
-    /**
-     * Show creation form.
-     */
+    
     public function create()
     {
         $categories = TicketCategory::where('status', 'active')->get();
         return view('modules.tickets.create', compact('categories'));
     }
 
-    /**
-     * Store new ticket.
-     */
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -108,21 +97,17 @@ class TicketController extends Controller
         $user = Auth::user();
         $category = TicketCategory::find($request->category_id);
 
-        // Generate Ticket Number: TKT-YYYYMMDD-XXXX
         $today = Carbon::today()->format('Ymd');
         $random = strtoupper(Str::random(4));
         $ticketNumber = "TKT-{$today}-{$random}";
 
-        // Calculate SLA Deadline
         $slaDeadline = Carbon::now()->addHours($category->sla_hours);
 
-        // Determine initial assignment according to hierarchy.
-        // Employee -> Team Lead (Reporting Manager)
         $assignedTo = null;
         if ($user->reporting_to) {
             $assignedTo = $user->reporting_to;
         } else {
-            // Find Team Lead in the department
+            
             $lead = User::whereHas('roles', function($q) {
                 $q->where('name', 'Team Lead');
             })->where('department_id', $user->department_id)->first();
@@ -143,7 +128,8 @@ class TicketController extends Controller
             'sla_deadline' => $slaDeadline
         ]);
 
-        // Upload attachments
+        // ===================================Upload attachments==================================================
+
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
                 $path = $file->store('attachments', 'public');
@@ -158,7 +144,6 @@ class TicketController extends Controller
             }
         }
 
-        // Log action
         ActivityLog::create([
             'user_id' => $user->id,
             'action' => 'TICKET CREATED',
@@ -167,7 +152,6 @@ class TicketController extends Controller
             'user_agent' => $request->userAgent()
         ]);
 
-        // Trigger Notification
         if ($assignedTo) {
             $assignee = User::find($assignedTo);
             try {
@@ -180,14 +164,12 @@ class TicketController extends Controller
         return redirect()->route('tickets.show', $ticket->id)->with('status', 'Ticket raised successfully.');
     }
 
-    /**
-     * Show single ticket details.
-     */
+    
     public function show(Ticket $ticket)
     {
         $user = Auth::user();
         
-        // Authorization check
+        
         if (!$user->isAdmin()) {
             if ($user->isEmployee() && $ticket->user_id !== $user->id) {
                 abort(403, 'Unauthorized access to this ticket.');
@@ -196,7 +178,6 @@ class TicketController extends Controller
 
         $ticket->load(['creator', 'assignee', 'category', 'department', 'comments.user', 'attachments', 'escalations.oldAssignee', 'escalations.escalatedTo']);
         
-        // Fetch candidates for ticket assignment (Agents, Leads, Managers in same department or Admins)
         $agents = User::whereHas('roles', function($q) {
             $q->whereIn('name', ['Admin', 'Project Manager', 'Team Lead', 'HR']);
         })->where('status', 'active')->get();
@@ -204,9 +185,6 @@ class TicketController extends Controller
         return view('modules.tickets.show', compact('ticket', 'agents'));
     }
 
-    /**
-     * Assign ticket to agent.
-     */
     public function assign(Request $request, Ticket $ticket)
     {
         $request->validate([
@@ -218,17 +196,16 @@ class TicketController extends Controller
 
         $ticket->update([
             'assigned_to' => $agent->id,
-            'status' => 'in_progress' // Auto change to in progress upon assignment
+            'status' => 'in_progress' 
         ]);
 
-        // Log timeline comment
         $ticket->comments()->create([
             'user_id' => auth()->id(),
             'comment' => "Ticket assigned to {$agent->name} (Previous: " . ($oldAssignee ? $oldAssignee->name : 'None') . ").",
             'is_internal' => true
         ]);
 
-        // Notification
+        // =================================== Notification ==================================================
         try {
             $agent->notify(new TicketAssignedNotification($ticket, $agent));
         } catch (\Exception $e) {
@@ -241,9 +218,7 @@ class TicketController extends Controller
         ]);
     }
 
-    /**
-     * Transition ticket status.
-     */
+    
     public function updateStatus(Request $request, Ticket $ticket)
     {
         $request->validate([
@@ -254,10 +229,9 @@ class TicketController extends Controller
         $oldStatus = $ticket->status;
         $ticket->status = $request->status;
 
-        // If closing or resolving, update metrics if needed
         $ticket->save();
 
-        // Create log comment
+        // ============================ Create log comment=================================================
         $commentText = "Status changed from " . strtoupper(str_replace('_', ' ', $oldStatus)) . " to " . strtoupper(str_replace('_', ' ', $request->status)) . ".";
         if ($request->filled('comment')) {
             $commentText .= " Note: " . $request->comment;
@@ -269,7 +243,7 @@ class TicketController extends Controller
             'is_internal' => false
         ]);
 
-        // Notification
+        
         $creator = $ticket->creator;
         try {
             $creator->notify(new TicketStatusChangedNotification($ticket, $creator, $request->status));
@@ -283,9 +257,7 @@ class TicketController extends Controller
         ]);
     }
 
-    /**
-     * Manual escalation override.
-     */
+    
     public function escalate(Request $request, Ticket $ticket)
     {
         $request->validate([
@@ -296,11 +268,10 @@ class TicketController extends Controller
         $oldAssignee = $ticket->assignee;
         $escalatedTo = null;
 
-        // Escalation Logic: Find manager of current assignee or creator
         if ($oldAssignee && $oldAssignee->reporting_to) {
             $escalatedTo = User::find($oldAssignee->reporting_to);
         } else {
-            // Find department head or Admin
+           
             $escalatedTo = User::whereHas('roles', function($q) {
                 $q->where('name', 'Admin');
             })->first();
@@ -313,10 +284,8 @@ class TicketController extends Controller
             ], 422);
         }
 
-        // Determine level
         $currentLevel = Escalation::where('ticket_id', $ticket->id)->count() + 1;
 
-        // Create Escalation Log
         Escalation::create([
             'ticket_id' => $ticket->id,
             'old_assigned_to' => $oldAssignee ? $oldAssignee->id : null,
@@ -329,10 +298,9 @@ class TicketController extends Controller
         $ticket->update([
             'assigned_to' => $escalatedTo->id,
             'escalated_at' => Carbon::now(),
-            'status' => 'open' // Set back to open so the supervisor sees it
+            'status' => 'open' 
         ]);
 
-        // Notification
         try {
             $escalatedTo->notify(new \App\Notifications\TicketEscalatedNotification($ticket, $escalatedTo));
         } catch (\Exception $e) {

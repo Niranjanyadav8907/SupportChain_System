@@ -6,7 +6,6 @@
 <section id="hero" class="hero-section">
     <div class="container">
         <div class="row align-items-center g-5">
-            <!-- Hero Left: Title & Workflow Preview -->
             <div class="col-lg-6 text-center text-lg-start fade-in-up-trigger">
                 <span class="hero-tagline">
                     <i class="bi bi-shield-check-fill me-2"></i> Company Internal Utility Portal

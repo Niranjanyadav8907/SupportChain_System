@@ -11,15 +11,11 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    /**
-     * Display users administration.
-     */
     public function index()
     {
         $users = User::with(['department', 'roles', 'manager'])->get();
         $roles = Role::all();
         $departments = Department::all();
-        // Fetch users who can be managers
         $managers = User::whereHas('roles', function($q) {
             $q->whereIn('name', ['Admin', 'Project Manager', 'Team Lead']);
         })->get();
@@ -27,9 +23,6 @@ class UserController extends Controller
         return view('modules.users.index', compact('users', 'roles', 'departments', 'managers'));
     }
 
-    /**
-     * Store user.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -55,7 +48,6 @@ class UserController extends Controller
 
         $user->roles()->sync($request->roles);
 
-        // Also create/sync Hierarchy model entry
         \App\Models\Hierarchy::updateOrCreate(
             ['user_id' => $user->id],
             [
@@ -72,9 +64,6 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Update user.
-     */
     public function update(Request $request, User $user)
     {
         $request->validate([
@@ -105,7 +94,6 @@ class UserController extends Controller
         $user->update($data);
         $user->roles()->sync($request->roles);
 
-        // Update Hierarchy
         \App\Models\Hierarchy::updateOrCreate(
             ['user_id' => $user->id],
             [
@@ -122,12 +110,8 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Delete user.
-     */
     public function destroy(User $user)
     {
-        // Prevent self deletion
         if (auth()->id() === $user->id) {
             return response()->json([
                 'success' => false,

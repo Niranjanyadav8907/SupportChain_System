@@ -9,9 +9,9 @@ use Illuminate\Validation\Rule;
 
 class RoleController extends Controller
 {
-    /**
-     * Display roles and permissions.
-     */
+    
+    // ============================ Display roles and permissions.=============================
+    
     public function index()
     {
         $roles = Role::with('permissions')->get();
@@ -20,9 +20,9 @@ class RoleController extends Controller
         return view('modules.roles.index', compact('roles', 'permissions'));
     }
 
-    /**
-     * Store role.
-     */
+    
+    // =================================== Store role.========================================
+     
     public function store(Request $request)
     {
         $request->validate([
@@ -45,9 +45,9 @@ class RoleController extends Controller
         ]);
     }
 
-    /**
-     * Update role.
-     */
+    
+    //============================== Update role.========================================
+     
     public function update(Request $request, Role $role)
     {
         $request->validate([
@@ -57,7 +57,7 @@ class RoleController extends Controller
             'permissions.*' => 'exists:permissions,id',
         ]);
 
-        // Guard default roles from rename/delete to prevent system breakage
+       
         $protectedRoles = ['Admin', 'Team Lead', 'Project Manager', 'HR', 'Employee'];
         if (in_array($role->name, $protectedRoles) && $role->name !== $request->name) {
             return response()->json([
@@ -76,9 +76,9 @@ class RoleController extends Controller
         ]);
     }
 
-    /**
-     * Delete role.
-     */
+    
+     //=================================== Delete role. ====================================
+     
     public function destroy(Role $role)
     {
         $protectedRoles = ['Admin', 'Team Lead', 'Project Manager', 'HR', 'Employee'];
