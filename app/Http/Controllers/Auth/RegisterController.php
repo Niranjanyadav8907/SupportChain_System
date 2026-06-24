@@ -13,9 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 class RegisterController extends Controller
 {
-    /**
-     * Show registration form.
-     */
+    
     public function showRegistrationForm()
     {
         if (Auth::check()) {
@@ -24,7 +22,6 @@ class RegisterController extends Controller
 
         $departments = Department::all();
         $roles = Role::all();
-        // Fetch users who are potential managers (TL, PM, Admin) using direct role relation
         $managers = User::whereHas('role', function($q) {
             $q->whereIn('name', ['Admin', 'Project Manager', 'Team Lead']);
         })->get();
@@ -32,9 +29,9 @@ class RegisterController extends Controller
         return view('auth.register', compact('departments', 'roles', 'managers'));
     }
 
-    /**
-     * Handle registration.
-     */
+    
+     //============================  Handle registration.========================================
+     
     public function register(Request $request)
     {
         $request->validate([
@@ -43,16 +40,18 @@ class RegisterController extends Controller
             'employee_id' => 'required|string|max:50|unique:users,employee_id',
             'password' => 'required|string|min:8|confirmed',
             'department_id' => 'required|exists:departments,id',
-            'role_id' => 'required|exists:roles,id',
+            //'role_id' => 'required|exists:roles,id',
             'reporting_to' => 'nullable|exists:users,id',
             'phone' => 'nullable|string|max:20',
         ]);
+
+       $employeeRole = Role::where('name', 'Employee')->firstOrFail();
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'employee_id' => $request->employee_id,
-            'role_id' => $request->role_id,
+            'role_id' => $employeeRole->id,
             'password' => Hash::make($request->password),
             'department_id' => $request->department_id,
             'reporting_to' => $request->reporting_to,
@@ -60,10 +59,10 @@ class RegisterController extends Controller
             'status' => 'active',
         ]);
 
-        // Role is assigned directly on the users table via role_id.
-        // No role_user pivot or Hierarchy record creation at registration stage.
+        $user->roles()->sync([$employeeRole->id]);
 
-        // Log registration
+
+        // ============================Log registration ======================================
         ActivityLog::create([
             'user_id' => $user->id,
             'action' => 'AUTH REGISTER',

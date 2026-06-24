@@ -110,8 +110,10 @@ class UserController extends Controller
         ]);
     }
 
+    
     public function destroy(User $user)
     {
+        // Prevent self deletion
         if (auth()->id() === $user->id) {
             return response()->json([
                 'success' => false,
