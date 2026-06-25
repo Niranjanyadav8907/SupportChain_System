@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 
 class HierarchyController extends Controller
 {
-    /**
-     * Display reporting structure.
-     */
+    
+    //=================================== Display reporting structure.============================
+    
     public function index()
     {
         $users = User::with(['manager', 'roles', 'department'])->get();
@@ -25,9 +25,9 @@ class HierarchyController extends Controller
         return view('modules.hierarchy.index', compact('users', 'managers', 'rootNodes'));
     }
 
-    /**
-     * Map user reporting manager.
-     */
+    
+     //===================================== Map user reporting manager. ============================
+     
     public function updateManager(Request $request)
     {
         $request->validate([

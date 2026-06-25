@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
-    /**
-     * Display notification center.
-     */
+    
+    //========================== Display notification center.=================================
+    
     public function index()
     {
         $user = Auth::user();
@@ -18,9 +18,9 @@ class NotificationController extends Controller
         return view('modules.notifications.index', compact('notifications'));
     }
 
-    /**
-     * Mark notification as read.
-     */
+    
+    //================================== Mark notification as read. ==============================
+    
     public function markAsRead(Request $request, $id)
     {
         $notification = Auth::user()->notifications()->find($id);
@@ -39,9 +39,9 @@ class NotificationController extends Controller
         return back()->with('status', 'Notification marked as read.');
     }
 
-    /**
-     * Mark all notifications as read.
-     */
+    
+    //=============================== Mark all notifications as read. ===================================
+    
     public function markAllAsRead(Request $request)
     {
         Auth::user()->unreadNotifications->markAsRead();
@@ -56,9 +56,9 @@ class NotificationController extends Controller
         return back()->with('status', 'All notifications marked as read.');
     }
 
-    /**
-     * Get unread notifications count.
-     */
+    
+    //=================================== Get unread notifications count.=================================
+     
     public function unreadCount()
     {
         return response()->json([

@@ -9,9 +9,9 @@ use Carbon\Carbon;
 
 class EscalationController extends Controller
 {
-    /**
-     * Display escalations log.
-     */
+    
+    //======================================= Display escalations log.==========================================
+    
     public function index()
     {
         $user = auth()->user();
@@ -31,9 +31,9 @@ class EscalationController extends Controller
         return view('modules.escalations.index', compact('escalations'));
     }
 
-    /**
-     * Mark escalation as resolved.
-     */
+    
+    //================================= Mark escalation as resolved.===============================================
+    
     public function resolve(Request $request, Escalation $escalation)
     {
         $escalation->update([

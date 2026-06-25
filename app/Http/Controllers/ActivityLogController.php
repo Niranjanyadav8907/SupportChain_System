@@ -7,9 +7,6 @@ use Illuminate\Http\Request;
 
 class ActivityLogController extends Controller
 {
-    /**
-     * Display activity log.
-     */
     public function index()
     {
         $logs = ActivityLog::with('user')->latest()->paginate(50);

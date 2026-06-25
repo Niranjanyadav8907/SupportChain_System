@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 
 class PermissionController extends Controller
 {
-    /**
-     * Display a list of permissions.
-     */
+    
+    //===================================== Display a list of permissions. ================================
+    
     public function index()
     {
         $permissions = Permission::all();

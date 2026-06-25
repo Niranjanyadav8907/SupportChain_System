@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    /**
-     * Display the portal dashboard.
-     */
+    
+    //=======================  Display the portal dashboard. =====================================
+     
     public function index()
     {
         $user = Auth::user();
@@ -27,7 +27,7 @@ class DashboardController extends Controller
             $stats['closed_tickets'] = Ticket::where('status', 'closed')->count();
             $stats['escalated_tickets'] = Ticket::whereNotNull('escalated_at')->count();
         } elseif ($user->isTeamLead()) {
-            // Team Lead sees tickets of team members who report to them
+            
             $subordinateIds = User::where('reporting_to', $user->id)->pluck('id')->toArray();
             $subordinateIds[] = $user->id; // Include self
 

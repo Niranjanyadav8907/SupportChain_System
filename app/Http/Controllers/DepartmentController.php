@@ -10,9 +10,9 @@ use Illuminate\Validation\Rule;
 
 class DepartmentController extends Controller
 {
-    /**
-     * Display departments.
-     */
+    
+    //================================ Display departments.========================================
+     
     public function index()
     {
         $departments = Department::with(['users', 'assignedUsers'])->get();
@@ -24,9 +24,9 @@ class DepartmentController extends Controller
         return view('modules.departments.index', compact('departments', 'potentialHeads'));
     }
 
-    /**
-     * Store department.
-     */
+    
+    //================================== Store department. ============================================
+     
     public function store(Request $request)
     {
         $request->validate([
@@ -43,9 +43,9 @@ class DepartmentController extends Controller
         ]);
     }
 
-    /**
-     * Update department.
-     */
+    
+    //=========================== Update department.====================================================
+     
     public function update(Request $request, Department $department)
     {
         $request->validate([
@@ -62,9 +62,9 @@ class DepartmentController extends Controller
         ]);
     }
 
-    /**
-     * Delete department.
-     */
+    
+    //============================ Delete department.======================================
+    
     public function destroy(Department $department)
     {
         // Restrict delete if tickets exist
@@ -83,9 +83,9 @@ class DepartmentController extends Controller
         ]);
     }
 
-    /**
-     * Assign Head of Department.
-     */
+    
+    //================================ Assign Head of Department. ============================================
+     
     public function assignHead(Request $request, Department $department)
     {
         $request->validate([

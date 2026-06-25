@@ -11,18 +11,18 @@ use Illuminate\Validation\Rule;
 
 class ProfileController extends Controller
 {
-    /**
-     * Show profile.
-     */
+    
+    //======================================  Show profile. ============================
+     
     public function index()
     {
         $user = Auth::user()->load(['department', 'roles', 'manager']);
         return view('profile.index', compact('user'));
     }
 
-    /**
-     * Update profile details.
-     */
+    
+    //=============================== Update profile details.============================
+    
     public function update(Request $request)
     {
         $user = Auth::user();
@@ -51,9 +51,9 @@ class ProfileController extends Controller
         return back()->with('status', 'Profile details updated successfully.');
     }
 
-    /**
-     * Change user password.
-     */
+    
+    //========================================== Change user password.================================================
+    
     public function changePassword(Request $request)
     {
         $request->validate([
