@@ -717,12 +717,12 @@
                 </div>
             </div>
 
-            <!-- Form Panel -->
+            <!-- Form Panel 
             <div class="col-lg-7 fade-in-up-trigger">
                 <div class="contact-form-wrapper">
                     <h4 class="text-primary fw-bold mb-4"><i class="bi bi-plus-circle me-2"></i>Create Ticket Inquiry</h4>
                     
-                    <!-- Alert dynamic success indicator -->
+                    
                     <div id="formSuccessAlert" class="alert alert-success d-none mb-4" role="alert" style="background-color: rgba(25, 135, 84, 0.08); border-color: rgba(25, 135, 84, 0.2); color: #198754;">
                         <div class="d-flex align-items-center gap-2">
                             <i class="bi bi-check-circle-fill"></i>
@@ -765,7 +765,91 @@
                         </div>
                     </form>
                 </div>
+            </div> 
+            -->
+
+            <div class="col-lg-7 fade-in-up-trigger">
+
+                <div class="stats-grid">
+
+                    <div class="stat-card image-card">
+                        <img src="{{ asset('images/100-Industry-specific-AI-Use-Cases.jpg') }}" alt="">
+                    </div>
+
+                    <div class="stat-card text-card">
+                        <h2>4</h2>
+                        <p>Continents</p>
+                    </div>
+
+                    <div class="stat-card image-card">
+                        <img src="{{ asset('images/4-contients-new.jpg') }}" alt="">
+                    </div>
+
+                    <div class="stat-card text-card">
+                        <h2>13</h2>
+                        <p>Countries</p>
+                    </div>
+
+                    <div class="stat-card image-card">
+                        <img src="{{ asset('images/13-countries.jpg') }}" alt="">
+                    </div>
+
+                    <div class="stat-card text-card">
+                        <h2>65</h2>
+                        <p>Delivery Centers</p>
+                    </div>
+
+                    <div class="stat-card image-card">
+                        <img src="{{ asset('images/700-clients.jpg') }}" alt="">
+                    </div>
+
+                    <div class="stat-card text-card">
+                        <h2>700+</h2>
+                        <p>Clients</p>
+                    </div>
+
+                    <div class="stat-card image-card">
+                        <img src="{{ asset('images/13-countries.jpg') }}" alt="">
+                    </div>
+
+                    <div class="stat-card text-card">
+                        <h2>66,000+</h2>
+                        <p>Employees</p>
+                    </div>
+
+                    <div class="stat-card image-card">
+                        <img src="{{ asset('images/3-Design-hubs.jpg') }}" alt="">
+                    </div>
+
+                    <div class="stat-card text-card large-text">
+                        <h2>3</h2>
+                        <p>
+                            DeSign Hubs Across New York,<br>
+                            London and Pune, India
+                        </p>
+                    </div>
+
+                    <div class="stat-card image-card">
+                        <img src="{{ asset('images/100-Industry-specific-AI-Use-Cases.jpg') }}" alt="">
+                    </div>
+
+                    <div class="stat-card text-card">
+                        <h2>20+</h2>
+                        <p>
+                            Industry and Domain Centers
+                            of Excellence
+                        </p>
+                    </div>
+
+                    <div class="stat-card image-card">
+                        <img src="{{ asset('images/700-clients.jpg') }}" alt="">
+                    </div>
+
+                </div>
+
             </div>
+
+            
         </div>
     </div>
 </section>
