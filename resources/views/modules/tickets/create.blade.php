@@ -58,6 +58,34 @@
                             </div>
                         </div>
 
+                        <!-- Assign Ticket -->
+                        <div class="mb-3">
+                            <label for="assigned_to" class="form-label fw-semibold">Assign Ticket</label>
+                            <select class="form-select @error('assigned_to') is-invalid @enderror" id="assigned_to" name="assigned_to">
+                                <option value="" selected>Auto Assign (Default)</option>
+                                @foreach($assignableUsers as $assignUser)
+                                    <option value="{{ $assignUser->id }}" {{ old('assigned_to') == $assignUser->id ? 'selected' : '' }}>
+                                        {{ $assignUser->name }}
+                                        @if($assignUser->roles->first())
+                                            ({{ $assignUser->roles->first()->name }})
+                                        @endif
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('assigned_to')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="text-muted mt-1 d-block">
+                                @auth
+                                    @if(auth()->user()->isEmployee())
+                                        <i class="bi bi-info-circle me-1"></i> As an Employee, you can assign tickets to any role except Admin.
+                                    @else
+                                        <i class="bi bi-info-circle me-1"></i> You can assign this ticket directly to any available user.
+                                    @endif
+                                @endauth
+                            </small>
+                        </div>
+
                         <!-- Ticket Description -->
                         <div class="mb-4">
                             <label for="description" class="form-label fw-semibold">Detailed Description</label>

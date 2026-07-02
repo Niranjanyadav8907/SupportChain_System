@@ -77,13 +77,25 @@ class TicketController extends Controller
     }
 
     
-    public function create()
+   public function create()
     {
         $categories = TicketCategory::where('status', 'active')->get();
-        return view('modules.tickets.create', compact('categories'));
+
+        $user = Auth::user();
+
+        if ($user->isEmployee()) {
+            $assignableUsers = User::whereHas('roles', function ($q) {
+                $q->whereIn('name', ['HR', 'Project Manager', 'Team Lead']);
+            })->where('status', 'active')->with('roles')->get();
+        } else {
+            $assignableUsers = User::whereHas('roles', function ($q) {
+                $q->whereIn('name', ['Admin', 'HR', 'Project Manager', 'Team Lead']);
+            })->where('status', 'active')->with('roles')->get();
+        }
+
+        return view('modules.tickets.create', compact('categories', 'assignableUsers'));
     }
 
-    
     public function store(Request $request)
     {
         $request->validate([
@@ -92,6 +104,7 @@ class TicketController extends Controller
             'category_id' => 'required|exists:ticket_categories,id',
             'priority' => 'required|in:low,medium,high,critical',
             'attachments.*' => 'nullable|file|max:10240', // 10MB limit per file
+            'assigned_to' => 'nullable|exists:users,id',
         ]);
 
         $user = Auth::user();
@@ -103,16 +116,19 @@ class TicketController extends Controller
 
         $slaDeadline = Carbon::now()->addHours($category->sla_hours);
 
-        $assignedTo = null;
-        if ($user->reporting_to) {
-            $assignedTo = $user->reporting_to;
+        // ===================== Assign Logic =====================
+        if ($request->filled('assigned_to')) {
+            $assignedTo = $request->assigned_to;
         } else {
-            
-            $lead = User::whereHas('roles', function($q) {
-                $q->where('name', 'Team Lead');
-            })->where('department_id', $user->department_id)->first();
-            
-            $assignedTo = $lead ? $lead->id : null;
+            if ($user->reporting_to) {
+                $assignedTo = $user->reporting_to;
+            } else {
+                $lead = User::whereHas('roles', function($q) {
+                    $q->where('name', 'Team Lead');
+                })->where('department_id', $user->department_id)->first();
+
+                $assignedTo = $lead ? $lead->id : null;
+            }
         }
 
         $ticket = Ticket::create([
