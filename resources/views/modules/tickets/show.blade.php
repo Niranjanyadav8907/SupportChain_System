@@ -63,7 +63,7 @@
 
                     <!-- Tab Contents -->
                     <div class="tab-content" id="ticketTabsContent">
-                        
+
                         <!-- 1. Conversation Timeline -->
                         <div class="tab-pane fade show active" id="conversation" role="tabpanel">
                             <!-- Ticket Description (First Post) -->
@@ -99,12 +99,15 @@
                                                 <small class="text-muted fs-8">{{ $comment->created_at->format('d M Y h:i A') }}</small>
                                             </div>
                                             <p class="mb-0 small text-slate-800" style="white-space: pre-wrap;">{{ $comment->comment }}</p>
-                                            
+
                                             @if($comment->attachment_path)
                                                 <div class="mt-2 pt-2 border-top border-white border-opacity-10">
-                                                    <a href="{{ asset('storage/' . $comment->attachment_path) }}" target="_blank" class="btn btn-sm btn-outline-secondary py-1 px-2 rounded-3 text-xs">
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-outline-secondary py-1 px-2 rounded-3 text-xs attachment-preview-btn"
+                                                            data-url="{{ asset('storage/' . $comment->attachment_path) }}"
+                                                            data-name="Attachment">
                                                         <i class="bi bi-paperclip me-1"></i> View Attachment
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             @endif
                                         </div>
@@ -189,9 +192,17 @@
                                                     <small class="text-muted">{{ $attach->formatted_size }}</small>
                                                 </div>
                                             </div>
-                                            <a href="{{ asset('storage/' . $attach->file_path) }}" target="_blank" class="btn btn-sm btn-light border">
-                                                <i class="bi bi-download"></i>
-                                            </a>
+                                            <div class="d-flex gap-2">
+                                                <button type="button"
+                                                        class="btn btn-sm btn-light border attachment-preview-btn"
+                                                        data-url="{{ asset('storage/' . $attach->file_path) }}"
+                                                        data-name="{{ $attach->file_name }}">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <a href="{{ asset('storage/' . $attach->file_path) }}" download class="btn btn-sm btn-light border">
+                                                    <i class="bi bi-download"></i>
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 @empty
@@ -268,7 +279,7 @@
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-body p-4">
                         <h5 class="fw-bold mb-4 text-slate-800">Queue & Action Center</h5>
-                        
+
                         <!-- Assign ticket -->
                         <div class="mb-3">
                             <label class="form-label fw-semibold small text-muted text-uppercase">Assign Ticket</label>
@@ -324,11 +335,64 @@
         </div>
     </div>
 </div>
+
+<!-- Attachment Preview Modal -->
+<div class="modal fade" id="attachmentPreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-header">
+                <h6 class="modal-title fw-bold" id="attachmentModalLabel">Attachment Preview</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center" id="attachmentModalBody" style="min-height: 300px;">
+                <!-- Content injected via JS -->
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="attachmentDownloadBtn" download class="btn btn-primary btn-sm">
+                    <i class="bi bi-download me-1"></i> Download
+                </a>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
 <script>
     $(document).ready(function() {
+
+        // Attachment Preview Modal Trigger
+        $(document).on('click', '.attachment-preview-btn', function () {
+            var url = $(this).data('url');
+            var name = $(this).data('name');
+            var ext = url.split('.').pop().toLowerCase().split('?')[0];
+
+            var body = $('#attachmentModalBody');
+            $('#attachmentModalLabel').text(name);
+            $('#attachmentDownloadBtn').attr('href', url);
+
+            body.empty();
+
+            if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
+                body.html('<img src="' + url + '" class="img-fluid rounded-3" style="max-height: 70vh;">');
+            } else if (ext === 'pdf') {
+                body.html('<iframe src="' + url + '" style="width:100%; height:70vh; border:0;"></iframe>');
+            } else {
+                body.html(
+                    '<div class="py-5">' +
+                        '<i class="bi bi-file-earmark-text fs-1 text-primary d-block mb-3"></i>' +
+                        '<p class="mb-0">Is file type ka preview available nahi hai.</p>' +
+                        '<small class="text-muted">Neeche download button se file open karein.</small>' +
+                    '</div>'
+                );
+            }
+
+            var modal = new bootstrap.Modal(document.getElementById('attachmentPreviewModal'));
+            modal.show();
+        });
+
         // Comment submission AJAX
         $('#commentForm').submit(function(e) {
             e.preventDefault();
