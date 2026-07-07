@@ -74,7 +74,7 @@
 
                         <div class="mb-3">
                             <label for="current_password" class="form-label fw-semibold">Current Password</label>
-                            <input type="password" class="form-control @error('current_password') is-invalid @enderror" id="current_password" name="current_password" required placeholder="••••••••">
+                            <input type="password" class="form-control @error('current_password') is-invalid @enderror" id="current_password" name="current_password" required placeholder=" ">
                             @error('current_password')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
@@ -90,7 +90,7 @@
 
                         <div class="mb-3">
                             <label for="new_password_confirmation" class="form-label fw-semibold">Confirm New Password</label>
-                            <input type="password" class="form-control" id="new_password_confirmation" name="new_password_confirmation" required placeholder="••••••••">
+                            <input type="password" class="form-control" id="new_password_confirmation" name="new_password_confirmation" required placeholder="">
                         </div>
 
                         <button type="submit" class="btn btn-primary px-4 mt-3">

@@ -312,7 +312,7 @@ main.py-4 {
                     <span class="input-group-text-custom">
                         <i class="bi bi-lock"></i>
                     </span>
-                    <input id="password" type="password" class="form-control form-control-with-icon border-end-0 @error('password') is-invalid @enderror" name="password" required autocomplete="current-password" placeholder="••••••••">
+                    <input id="password" type="password" class="form-control form-control-with-icon border-end-0 @error('password') is-invalid @enderror" name="password" required autocomplete="current-password" placeholder=" ">
                     <span class="password-toggle-btn" id="togglePassword">
                         <i class="bi bi-eye" id="eyeIcon"></i>
                     </span>
