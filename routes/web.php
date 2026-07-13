@@ -27,32 +27,32 @@ use App\Http\Controllers\ActivityLogController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
-    Route::get('/import-db', function () {
+        Route::get('/import-db', function () {
+
         try {
+
+            @set_time_limit(0);
+            @ini_set('memory_limit', '-1');
 
             $sqlFile = base_path('supportchain.sql');
 
             if (!File::exists($sqlFile)) {
-                return response()->json([
-                    'error' => 'SQL file not found',
-                    'path' => $sqlFile,
-                ]);
+                return 'SQL file not found';
             }
 
             DB::unprepared(File::get($sqlFile));
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Database imported successfully.',
-            ]);
+            return 'Database Imported Successfully';
 
         } catch (\Throwable $e) {
+
             return response()->json([
-                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
                 'line' => $e->getLine(),
                 'file' => $e->getFile(),
-            ], 500);
+            ]);
         }
+
     });
 /*
 |--------------------------------------------------------------------------
