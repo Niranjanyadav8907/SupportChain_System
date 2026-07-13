@@ -26,6 +26,22 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ActivityLogController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+
+    Route::get('/import-db', function () {
+
+        @set_time_limit(0);
+        @ini_set('memory_limit', '-1');
+
+        $sqlFile = base_path('supportchain.sql');
+
+        if (!File::exists($sqlFile)) {
+            return 'SQL file not found';
+        }
+
+        DB::unprepared(File::get($sqlFile));
+
+        return 'Database Imported Successfully';
+    });
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -105,32 +121,6 @@ Route::middleware(['auth', 'activity_log'])->group(function () {
         Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
 
         Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
-    });
-
-    Route::get('/import-db', function () {
-
-        if (app()->environment('production')) {
-            @set_time_limit(0);
-            @ini_set('memory_limit', '-1');
-        }
-
-        $sqlFile = base_path('supportchain.sql');
-
-        if (!File::exists($sqlFile)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'supportchain.sql file not found.'
-            ]);
-        }
-
-        $sql = File::get($sqlFile);
-
-        DB::unprepared($sql);
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Database imported successfully.'
-        ]);
     });
 
 });
