@@ -357,7 +357,16 @@ main {
                         <span class="input-group-text-custom">
                             <i class="bi bi-telephone"></i>
                         </span>
-                        <input id="phone" type="text" class="form-control form-control-with-icon @error('phone') is-invalid @enderror" name="phone" value="{{ old('phone') }}" placeholder="+1 555-0199">
+                        <input
+                            id="phone"
+                            type="text"
+                            class="form-control form-control-with-icon @error('phone') is-invalid @enderror"
+                            name="phone"
+                            value="{{ old('phone') }}"
+                            placeholder="Enter Phone Number"
+                            maxlength="11"
+                            oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                        >
                         @error('phone')
                             <span class="invalid-feedback" role="alert">
                                 <strong>{{ $message }}</strong>

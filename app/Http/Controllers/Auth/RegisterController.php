@@ -42,7 +42,7 @@ class RegisterController extends Controller
             'department_id' => 'required|exists:departments,id',
             //'role_id' => 'required|exists:roles,id',
             'reporting_to' => 'nullable|exists:users,id',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|digits:11',
         ]);
 
        $employeeRole = Role::where('name', 'Employee')->firstOrFail();
