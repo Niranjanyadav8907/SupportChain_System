@@ -47,6 +47,14 @@ use Illuminate\Support\Facades\DB;
 
         return 'Database Imported Successfully';
     });
+    Route::get('/db-test', function () {
+        try {
+            DB::connection()->getPdo();
+            return 'Database Connected';
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    });
 
 /*
 |--------------------------------------------------------------------------
