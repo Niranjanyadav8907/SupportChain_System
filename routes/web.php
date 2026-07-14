@@ -24,6 +24,29 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\TicketCategoryController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ActivityLogController;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
+
+    Route::get('/import-db', function () {
+
+        $sqlFile = base_path('supportchain.sql');
+
+        if (!File::exists($sqlFile)) {
+            return 'SQL file not found';
+        }
+
+        $sql = File::get($sqlFile);
+
+        $queries = array_filter(array_map('trim', explode(';', $sql)));
+
+        foreach ($queries as $query) {
+            if ($query) {
+                DB::statement($query);
+            }
+        }
+
+        return 'Database Imported Successfully';
+    });
 
 /*
 |--------------------------------------------------------------------------
