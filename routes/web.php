@@ -26,6 +26,21 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ActivityLogController;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
+    Route::get('/db-test', function () {
+        try {
+            DB::connection()->getPdo();
+            return 'Database Connected';
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    });
+
+    Route::get('/check-sql', function () {
+        return [
+            'exists' => File::exists(base_path('supportchain.sql')),
+            'path' => base_path('supportchain.sql')
+        ];
+    });
 
     Route::get('/import-db', function () {
 
@@ -35,25 +50,9 @@ use Illuminate\Support\Facades\DB;
             return 'SQL file not found';
         }
 
-        $sql = File::get($sqlFile);
-
-        $queries = array_filter(array_map('trim', explode(';', $sql)));
-
-        foreach ($queries as $query) {
-            if ($query) {
-                DB::statement($query);
-            }
-        }
+        DB::unprepared(File::get($sqlFile));
 
         return 'Database Imported Successfully';
-    });
-    Route::get('/db-test', function () {
-        try {
-            DB::connection()->getPdo();
-            return 'Database Connected';
-        } catch (\Exception $e) {
-            return $e->getMessage();
-        }
     });
 
 /*
