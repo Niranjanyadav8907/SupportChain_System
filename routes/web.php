@@ -87,19 +87,29 @@ use Illuminate\Support\Facades\DB;
     });
 
     Route::get('/reset-db', function () {
+        try {
 
-        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
 
-        $tables = DB::select('SHOW TABLES');
+            $tables = DB::select('SHOW TABLES');
 
-        foreach ($tables as $table) {
-            $tableName = array_values((array)$table)[0];
-            DB::statement("DROP TABLE `$tableName`");
+            foreach ($tables as $table) {
+                $tableName = array_values((array) $table)[0];
+                DB::statement("DROP TABLE `$tableName`");
+            }
+
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+
+            return 'All tables dropped successfully';
+
+        } catch (\Throwable $e) {
+
+            return [
+                'error' => $e->getMessage(),
+                'line'  => $e->getLine(),
+                'file'  => $e->getFile(),
+            ];
         }
-
-        DB::statement('SET FOREIGN_KEY_CHECKS=1');
-
-        return 'All tables dropped';
     });
 
 /*
