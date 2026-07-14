@@ -82,6 +82,26 @@ use Illuminate\Support\Facades\DB;
         ];
     });
 
+    Route::get('/tables', function () {
+        return DB::select('SHOW TABLES');
+    });
+
+    Route::get('/reset-db', function () {
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+
+        $tables = DB::select('SHOW TABLES');
+
+        foreach ($tables as $table) {
+            $tableName = array_values((array)$table)[0];
+            DB::statement("DROP TABLE `$tableName`");
+        }
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+
+        return 'All tables dropped';
+    });
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
