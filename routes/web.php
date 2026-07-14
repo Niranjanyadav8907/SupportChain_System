@@ -55,6 +55,25 @@ use Illuminate\Support\Facades\DB;
         return 'Database Imported Successfully';
     });
 
+    Route::get('/import-db', function () {
+
+        try {
+
+            $sqlFile = base_path('supportchain.sql');
+
+            DB::unprepared(File::get($sqlFile));
+
+            return 'Database Imported Successfully';
+
+        } catch (\Throwable $e) {
+
+            return [
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+            ];
+        }
+    });
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
