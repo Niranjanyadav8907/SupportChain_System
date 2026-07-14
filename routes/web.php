@@ -73,6 +73,14 @@ use Illuminate\Support\Facades\DB;
             ];
         }
     });
+    Route::get('/db-config', function () {
+        return [
+            'default' => config('database.default'),
+            'db_connection' => env('DB_CONNECTION'),
+            'db_host' => env('DB_HOST'),
+            'db_database' => env('DB_DATABASE'),
+        ];
+    });
 
 /*
 |--------------------------------------------------------------------------
