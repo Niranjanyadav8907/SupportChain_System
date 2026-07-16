@@ -36,14 +36,19 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/mail-test', function () {
+Route::get('/smtp-test', function () {
 
-    Mail::raw('SMTP Test', function ($message) {
-        $message->to('amishs82667@gmail.com')
-                ->subject('SMTP Test');
-    });
+    $host = 'smtp.gmail.com';
+    $port = 587;
 
-    return 'Mail Sent';
+    $connection = @fsockopen($host, $port, $errno, $errstr, 15);
+
+    if ($connection) {
+        fclose($connection);
+        return "SMTP Connection Success";
+    }
+
+    return "SMTP Connection Failed | Error: {$errno} | {$errstr}";
 });
 
 // Authentication Routes
