@@ -36,6 +36,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/mail-test', function () {
+
+    Mail::raw('SMTP Test', function ($message) {
+        $message->to('amishs82667@gmail.com')
+                ->subject('SMTP Test');
+    });
+
+    return 'Mail Sent';
+});
+
 // Authentication Routes
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login']);
