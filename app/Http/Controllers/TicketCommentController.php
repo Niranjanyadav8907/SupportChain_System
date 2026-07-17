@@ -67,7 +67,14 @@ class TicketCommentController extends Controller
 
         if ($notifyUser && !$isInternal) {
             try {
-                $notifyUser->notify(new TicketCommentNotification($ticket, $comment, $notifyUser));
+                $notifyUser->notify(
+                    new TicketCommentNotification(
+                        $ticket,
+                        $user,
+                        $comment->comment,
+                        $isInternal
+                    )
+                );
             } catch (\Exception $e) {
                 Log::error("Failed to send TicketCommentNotification: " . $e->getMessage());
             }
