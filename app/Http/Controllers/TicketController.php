@@ -43,15 +43,22 @@ class TicketController extends Controller
                   ->orWhere('assigned_to', $user->id)
                   ->orWhereNotNull('escalated_at');
             });
-        } elseif ($user->isHR()) {
-            $query->whereHas('category', function($q) {
-                $q->whereIn('slug', ['hr-request', 'leave-request']);
+        }elseif ($user->isHR()) {
+
+            $query->where(function ($q) use ($user) {
+                $q->where('assigned_to', $user->id)
+                ->orWhereHas('category', function ($cat) {
+                    $cat->whereIn('slug', ['hr-request', 'leave-request']);
+                });
             });
+
         } else {
+
             $query->where(function ($q) use ($user) {
                 $q->where('user_id', $user->id)
                 ->orWhere('assigned_to', $user->id);
             });
+
         }
 
         // ================================ Apply filters=======================================
@@ -121,17 +128,18 @@ class TicketController extends Controller
 
         // ===================== Assign Logic =====================
         if ($request->filled('assigned_to')) {
-            $assignedTo = $request->assigned_to;
-        } else {
-            if ($user->reporting_to) {
-                $assignedTo = $user->reporting_to;
-            } else {
-                $lead = User::whereHas('roles', function($q) {
-                    $q->where('name', 'Team Lead');
-                })->where('department_id', $user->department_id)->first();
 
-                $assignedTo = $lead ? $lead->id : null;
-            }
+            $assignedTo = $request->assigned_to;
+
+        } else {
+
+            $lead = User::whereHas('roles', function ($q) {
+                $q->where('name', 'Team Lead');
+            })
+            ->where('status', 'active')
+            ->first();
+
+            $assignedTo = $lead ? $lead->id : null;
         }
 
         $ticket = Ticket::create([
