@@ -48,7 +48,10 @@ class TicketController extends Controller
                 $q->whereIn('slug', ['hr-request', 'leave-request']);
             });
         } else {
-            $query->where('user_id', $user->id);
+            $query->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                ->orWhere('assigned_to', $user->id);
+            });
         }
 
         // ================================ Apply filters=======================================
