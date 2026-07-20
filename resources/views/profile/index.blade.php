@@ -24,6 +24,15 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
+                        <div class="mb-3">
+                            <label for="employee_id" class="form-label fw-semibold">Employee ID</label>
+                            <input 
+                                type="text" 
+                                class="form-control bg-light" 
+                                id="employee_id" 
+                                value="{{ $user->employee_id }}" 
+                                readonly>
+                        </div>
 
                         <div class="mb-3">
                             <label for="email" class="form-label fw-semibold">Email Address</label>
