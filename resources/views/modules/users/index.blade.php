@@ -126,7 +126,7 @@
                             </select>
                         </div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3">                  
                         <label class="form-label fw-semibold">Roles</label>
                         <div class="d-flex flex-wrap gap-3">
                             @foreach($roles as $role)
